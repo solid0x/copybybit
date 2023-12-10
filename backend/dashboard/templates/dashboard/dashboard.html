@@ -10,7 +10,15 @@
   </head>
   <body>
     <div class="container mt-2">
-      <h4 class="display">CopyBybit</h4>
+      <div class="row">
+        <div class="col d-flex align-items-center">
+          <h4 class="">CopyBybit</h4>
+        </div>
+        <div class="col d-flex align-items-center justify-content-end">
+          <p class="mb-0 me-3 text-muted">{{ user.username }}</p>
+          <a href="/api/logout" class="btn btn-outline-danger">Logout</a>
+        </div>
+      </div>
       <h6 class="mt-4">Recently opened</h6>
       <table class="table" id="recent-positions">
         <thead>
@@ -53,7 +61,7 @@
           </tr>
         </tbody>
       </table>
-      <p class="text-end text-muted small"><span id="user-pos-spinner" class="spinner-border spinner-border-sm" role="status"></span><span id="user-pos-last-updated"> Last updated: -</span></p>
+      <p class="text-end text-muted small"><span id="user-pos-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span><span id="user-pos-last-updated"> Last updated: -</span></p>
       <h6 class="mt-4">API Key</h6>
       <p id="apikey"></p><button id="add-apikey" type="button" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#apikey-modal">Add</button><button id="edit-apikey" type="button" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#apikey-modal">Edit</button>
       <div class="modal fade" id="apikey-modal" tabindex="-1" role="dialog" aria-labelledby="apikey-modal-label" aria-hidden="true">

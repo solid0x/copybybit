@@ -49,6 +49,9 @@ function fetchAndUpdateRecentPositions() {
 }
 
 function fetchAndUpdateUserPositions() {
+    if (apiKey === "")
+        return;
+
     const spinner = document.getElementById("user-pos-spinner");
     spinner.classList.remove("d-none");
 
@@ -221,9 +224,9 @@ function updateApiKey(newApiKey, newApiSecret) {
     apiSecret = newApiSecret;
 }
 
+fetchAndUpdateUserProfile();
 fetchAndUpdateUserPositions();
 fetchAndUpdateRecentPositions();
-fetchAndUpdateUserProfile();
 
 setInterval(fetchAndUpdateRecentPositions, 120000);
 setInterval(fetchAndUpdateUserPositions, 60000);

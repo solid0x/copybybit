@@ -1,18 +1,23 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
-from bybit.utils import dummy_pos
 from .models import UserProfile
 
 
 def index(request):
     if request.user.is_authenticated:
-        profile = UserProfile.objects.get(user=request.user)
-        context = {'user_profile': profile}
-        return render(request, 'dashboard/dashboard.html', context)
+        return redirect('dashboard')
     else:
-        return render(request, 'dashboard/auth.html')
+        return redirect('login')
+
+
+def signin(request):
+    return render(request, 'dashboard/auth.html')
+
+
+def dashboard(request):
+    return render(request, 'dashboard/dashboard.html')
 
 
 def user_login(request):
@@ -24,11 +29,17 @@ def user_login(request):
     return redirect('index')
 
 
+def user_logout(request):
+    logout(request)
+    return redirect('index')
+
+
 def user_register(request):
     form = UserCreationForm(request.POST)
     print(form)
     if form.is_valid():
         user = form.save()
+        UserProfile.objects.create(user=user, api_key='', api_secret='')
         login(request, user)
     return redirect('index')
 
