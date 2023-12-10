@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'trade.apps.TradeConfig',
+    'bybit.apps.BybitConfig',
     'dashboard.apps.DashboardConfig',
     'django.contrib.admin',
     'django.contrib.auth',

@@ -1,0 +1,13 @@
+.table {
+    table-layout: fixed;
+    font-size: 0.9rem;
+}
+
+.symbol-label {
+    font-weight: bold;
+}
+
+.toast-error {
+  background-color: #f8d7da;
+  color: #dc3545;
+}

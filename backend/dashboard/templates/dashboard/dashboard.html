@@ -1,86 +1,120 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-  <title>CopyBybit</title>
-</head>
-<body>
-<div class="container mt-2">
-  <h4 class="display">CopyBybit</h4>
-
-  <h6 class="mt-4">Newly opened</h6>
-  <table class="table">
-    <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">First</th>
-      <th scope="col">Last</th>
-      <th scope="col">Handle</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>Larry</td>
-      <td>the Bird</td>
-      <td>@twitter</td>
-    </tr>
-    </tbody>
-  </table>
-
-  <h6 class="mt-4">Your positions</h6>
-  <div class="alert alert-warning" role="alert">
-    <h6>No active Bybit API key</h6>
-    <span>Set API key to copy traders' positions</span>
-  </div>
-
-  <h6 class="mt-4">API Key</h6>
-  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">+ Add</button>
-
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">API Key</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="form-group">
-              <label for="exampleInputEmail1">Key</label>
-              <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter API Key">
+  <head> {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <title>CopyBybit</title>
+  </head>
+  <body>
+    <div class="container mt-2">
+      <h4 class="display">CopyBybit</h4>
+      <h6 class="mt-4">Recently opened</h6>
+      <table class="table" id="recent-positions">
+        <thead>
+          <tr>
+            <th scope="col">Symbol</th>
+            <th scope="col">Trader</th>
+            <th scope="col">Entry Price</th>
+            <th scope="col">Size</th>
+            <th scope="col">Leverage</th>
+            <th scope="col">Open At</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="7">No data</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-end text-muted small"><span id="update-spinner" class="spinner-border spinner-border-sm" role="status"></span><span id="last-updated"> Last updated: -</span></p>
+      <h6 class="mt-4">Your positions</h6>
+      <div id="no-apikey" class="alert alert-warning" role="alert">
+        <h6>No active Bybit API key</h6><span>Set API key to copy traders' positions</span>
+      </div>
+      <table class="table" id="user-positions">
+        <thead>
+          <tr>
+            <th scope="col">Symbol</th>
+            <th scope="col">Entry Price</th>
+            <th scope="col">Mark Price</th>
+            <th scope="col">Size</th>
+            <th scope="col">Leverage</th>
+            <th scope="col">P&L</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td colspan="7">No data</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-end text-muted small"><span id="user-pos-spinner" class="spinner-border spinner-border-sm" role="status"></span><span id="user-pos-last-updated"> Last updated: -</span></p>
+      <h6 class="mt-4">API Key</h6>
+      <p id="apikey"></p><button id="add-apikey" type="button" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#apikey-modal">Add</button><button id="edit-apikey" type="button" class="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#apikey-modal">Edit</button>
+      <div class="modal fade" id="apikey-modal" tabindex="-1" role="dialog" aria-labelledby="apikey-modal-label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="apikey-modal-label">API Key</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="form-group">
-              <label for="exampleInputPassword1">Secret</label>
-              <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Enter API Secret" aria-describedby="passwordToggle">
+            <div class="modal-body">
+              <form> {% csrf_token %} <div class="form-group"><label for="api-key">Key</label><input type="text" class="form-control" id="api-key" placeholder="Enter API Key"></div>
+                <div class="form-group"><label for="api-secret">Secret</label><input type="password" class="form-control" id="api-secret" placeholder="Enter API Secret" aria-describedby="passwordToggle"></div>
+              </form>
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button><button type="button" class="btn btn-primary" id="submit-key">Save changes</button></div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
+    <div class="modal fade" id="copy-modal" tabindex="-1" role="dialog" aria-labelledby="copy-modal-label" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="copy-modal-label">Copy position</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <form>
+                {% csrf_token %}
+                <p class="mb-0">Symbol</p>
+                <p class="symbol-label mb-1" id="symbol"></p>
+                <label for="cost">Cost</label>
+                <input type="number" class="form-control" id="cost" placeholder="Enter position cost">
+                <label for="leverage">Leverage</label>
+                <input type="number" class="form-control mb-3" id="leverage" placeholder="Enter position leverage">
+                <div class="btn-group d-flex" role="group">
+                  <input type="radio" class="btn-check" name="btnradio" id="buy" value="Buy" autocomplete="off" checked>
+                  <label class="btn btn-outline-success" for="buy">Buy</label>
+                  <input type="radio" class="btn-check" name="btnradio" id="sell" value="Sell" autocomplete="off">
+                  <label class="btn btn-outline-danger" for="sell">Sell</label>
+                </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+            <span id="copy-spinner" class="spinner-border spinner-border-sm text-muted d-none" role="status"></span>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="close-copy-modal">Close</button>
+            <button type="button" class="btn btn-primary" id="copy-position">Open position</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-</body>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 10001">
+      <div id="toast" class="toast hide toast-error" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto" id="toast-title"></strong>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div id="toast-message" class="toast-body"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="{% static 'script.js' %}"></script>
+  </body>
 </html>
