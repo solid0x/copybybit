@@ -3,15 +3,12 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
 from bybit.utils import dummy_pos
-from trade.services import TradeService
 from .models import UserProfile
-from decimal import Decimal
 
 
 def index(request):
     if request.user.is_authenticated:
         profile = UserProfile.objects.get(user=request.user)
-        dummy_positions = [dummy_pos('BTCUSDT', 'Buy'), dummy_pos('ETHUSDT', 'Sell')]
         context = {'user_profile': profile}
         return render(request, 'dashboard/dashboard.html', context)
     else:

@@ -11,7 +11,7 @@ def recent_positions(request):
         follow_service = FollowService()
         # follow_service.check_positions()
         # recent_positions = follow_service.get_recent_positions()
-        recent_positions = [dummy_pos('BTCUSDT', 'Buy'), dummy_pos('ETHUSDT', 'Sell')]
-        return JsonResponse([asdict(pos) for pos in recent_positions], safe=False)
+        positions = [dummy_pos('BTCUSDT', 'Buy'), dummy_pos('ETHUSDT', 'Sell')]
+        return JsonResponse([asdict(pos) for pos in positions], safe=False)
     else:
         return render(request, 'dashboard/auth.html')
