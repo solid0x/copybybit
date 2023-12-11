@@ -161,9 +161,9 @@ function updateUserPositionsTable(positions) {
 		row.innerHTML += '<td>' + position.size + '</td>';
 		row.innerHTML += '<td>' + position.leverage + '</td>';
 		if (position.unrealised_pnl >= 0)
-		    row.innerHTML += '<td><span class="badge bg-success rounded-pill p-2">' + position.unrealised_pnl + '</span></td>';
+		    row.innerHTML += '<td><span class="badge bg-success rounded-pill p-2">+' + position.unrealised_pnl + ' $</span></td>';
 		else
-		    row.innerHTML += '<td><span class="badge bg-danger rounded-pill p-2">' + position.unrealised_pnl + '</span></td>';
+		    row.innerHTML += '<td><span class="badge bg-danger rounded-pill p-2">' + position.unrealised_pnl + ' $</span></td>';
 
 		var actionCell = document.createElement("td");
 		var closeButton = document.createElement("button");
