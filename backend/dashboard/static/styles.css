@@ -11,3 +11,7 @@
   background-color: #f8d7da;
   color: #dc3545;
 }
+
+#toast-container {
+    z-index: 10001;
+}

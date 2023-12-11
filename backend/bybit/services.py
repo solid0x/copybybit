@@ -1,8 +1,11 @@
+import logging
+
 from django.core.cache import cache
+
+from time import sleep
 
 from bybit.api import *
 from bybit.utils import *
-from time import sleep
 
 
 class PositionDiff:
@@ -16,7 +19,7 @@ class PositionDiff:
 class FollowService:
 
     def __init__(self, duration: str = DURATION_7D):
-        self.api = BybitAPI(use_testnet=False)
+        self.api = BybitLeadersAPI()
         self.duration = duration
 
         iteration = cache.get('iteration')

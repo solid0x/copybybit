@@ -1,5 +1,4 @@
 import requests
-import logging
 
 from pybit.unified_trading import HTTP
 from urllib.parse import quote
@@ -14,67 +13,6 @@ class BybitAPI:
         self.http = HTTP(api_key=api_key, api_secret=api_secret, testnet=use_testnet)
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': USERAGENT})
-        self.http_get(PUBLIC_BASE_URL)
-
-    def http_get(self, url):
-        return self.session.get(url, timeout=10)
-
-    def get_latest_prices(self, category=CATEGORY_LINEAR) -> dict[str, Decimal]:
-        result = {}
-        ticker_prices = self.http.get_tickers(category=category)['result']['list']
-        logging.debug(f'ticker_prices: {ticker_prices}')
-        for tp in ticker_prices:
-            result[tp['symbol']] = Decimal(tp['lastPrice'])
-        return result
-
-    def get_leader_list(self, duration=DURATION_30D, count=100) -> list[str]:
-        leaders = []
-        page = 1
-        while len(leaders) < count:
-            url = f'{PUBLIC_BASE_URL}/common/dynamic-leader-list?' \
-                  f'pageNo={page}&pageSize=50&sortType=SORT_TYPE_DESC&dataDuration={duration}&' \
-                  f'sortField=LEADER_SORT_FIELD_SORT_ROI'
-            result = self.http_get(url).json()['result']
-            logging.debug(f'[{page}] leader_list: {result}')
-            for leader in result['leaderDetails']:
-                leaders.append(leader['leaderMark'])
-            page += 1
-        return leaders[:count]
-
-    def get_leader_positions(self, mark) -> list[Position]:
-        url = f'{PUBLIC_BASE_URL}/common/position/list?leaderMark={quote(mark)}'
-        result = self.http_get(url).json()['result']['data']
-        positions = []
-        for p in result:
-            positions.append(Position(
-                p['symbol'],
-                p['side'],
-                Decimal(p['entryPrice']),
-                None,
-                Decimal(p['sizeX']) / 10 ** 8,
-                datetime.now(),
-                datetime.fromtimestamp(int(p['createdAtE3'][:-3])),
-                None,
-                Decimal(p['leverageE2']) / 100,
-                mark
-            ))
-        return positions
-
-    def get_leader_orders(self, mark: str, symbol: str) -> list[Order]:
-        mark = quote(mark)
-        url = f'{PUBLIC_BASE_URL}/common/order/list-detail?leaderMark={mark}&symbol={symbol}'
-        result = self.http_get(url).json()['result']['data']
-        orders = []
-        for o in result:
-            orders.append(Order(
-                o['symbol'],
-                o['side'],
-                Decimal(o['entryPrice']),
-                Decimal(o['sizeX']) / 10 ** 8,
-                datetime.fromtimestamp(int(o['createdAtE3'][:-3])),
-                datetime.fromtimestamp(int(o['transactTimeE3'][:-3]))
-            ))
-        return orders
 
     def get_wallet_balance(self):
         return self.http.get_wallet_balance(accountType=ACCOUNT_TYPE_UNIFIED)['result']['list'][0]
@@ -87,7 +25,6 @@ class BybitAPI:
 
     def get_ticker(self, symbol, category=CATEGORY_LINEAR) -> Ticker:
         ticker = self.http.get_tickers(category=category, symbol=symbol)['result']['list'][0]
-        logging.debug(f'ticker: {ticker}')
         return Ticker(
             symbol,
             Decimal(ticker['lastPrice']),
@@ -98,7 +35,6 @@ class BybitAPI:
 
     def get_instruments_info(self, category=CATEGORY_LINEAR) -> dict[str, InstrumentInfo]:
         instruments_info = self.http.get_instruments_info(category=category)['result']['list']
-        logging.debug(f'instruments_info: {instruments_info}')
         return {
             i['symbol']: InstrumentInfo(
                 i['symbol'],
@@ -115,43 +51,46 @@ class BybitAPI:
         response = self.http.get_positions(symbol=symbol, category=category)['result']['list']
         position_idx = HEDGE_MODE_BUY if side == SIDE_BUY else HEDGE_MODE_SELL
         position_info = [p for p in response if p['positionIdx'] == position_idx][0]
-        logging.debug(f'position_info: {position_info}')
-        side = position_info['side']
-        avg_price = position_info['avgPrice']
-        mark_price = position_info['markPrice']
-        size = position_info['size']
-        unrealised_pnl = position_info['unrealisedPnl']
-        unrealised_pnl = Decimal(unrealised_pnl) if unrealised_pnl else Decimal(0)
+
+        leverage = self.get_decimal(position_info['leverage'])
+        avg_price = self.get_decimal(position_info['avgPrice'])
+        mark_price = self.get_decimal(position_info['markPrice'])
+        size = self.get_decimal(position_info['size'])
+        unrealised_pnl = self.get_decimal(position_info['unrealisedPnl'])
+
         return PositionInfo(
             symbol,
             side,
-            Decimal(position_info['leverage']),
-            Decimal(avg_price) if avg_price else None,
+            leverage,
+            avg_price,
             mark_price,
-            Decimal(size) if size else None,
+            size,
             unrealised_pnl,
         )
 
     def get_positions_info(self, category=CATEGORY_LINEAR) -> list[PositionInfo]:
         result: list[PositionInfo] = []
         positions_info = self.http.get_positions(settleCoin='USDT', category=category)['result']['list']
+
         for position_info in positions_info:
             symbol = position_info['symbol']
             side = position_info['side']
-            avg_price = position_info['avgPrice']
-            mark_price = position_info['markPrice']
-            size = position_info['size']
-            unrealised_pnl = position_info['unrealisedPnl']
-            unrealised_pnl = Decimal(unrealised_pnl) if unrealised_pnl else Decimal(0)
+            leverage = self.get_decimal(position_info['leverage'])
+            avg_price = self.get_decimal(position_info['avgPrice'])
+            mark_price = self.get_decimal(position_info['markPrice'])
+            size = self.get_decimal(position_info['size'])
+            unrealised_pnl = self.get_decimal(position_info['unrealisedPnl'])
+
             result.append(PositionInfo(
                 symbol,
                 side,
-                Decimal(position_info['leverage']),
-                Decimal(avg_price) if avg_price else None,
+                leverage,
+                avg_price,
                 mark_price,
-                Decimal(size) if size else None,
+                size,
                 unrealised_pnl,
             ))
+
         return result
 
     def set_leverage(self, symbol, leverage, category=CATEGORY_LINEAR):
@@ -169,3 +108,61 @@ class BybitAPI:
             price=price,
             positionIdx=position_idx
         )['result']
+
+    @staticmethod
+    def get_decimal(value, default=Decimal(0)) -> Decimal:
+        if value:
+            return Decimal(value)
+        return default
+
+
+class BybitLeadersAPI:
+
+    def __init__(self):
+        self.session = requests.Session()
+        self.session.headers.update({'User-Agent': USERAGENT})
+        self.http_get(PUBLIC_BASE_URL)
+
+    def http_get(self, url, params=None):
+        return self.session.get(url, params=params, timeout=10)
+
+    def get_leader_list(self, duration=DURATION_30D, count=100) -> list[str]:
+        leaders = []
+        page = 1
+
+        while len(leaders) < count:
+            url = f'{PUBLIC_BASE_URL}/common/dynamic-leader-list'
+            result = self.http_get(url, {
+                'pageNo': page,
+                'pageSize': 50,
+                'sortType': 'SORT_TYPE_DESC',
+                'dataDuration': duration,
+                'sortField': 'LEADER_SORT_FIELD_SORT_ROI',
+            }).json()['result']
+
+            for leader in result['leaderDetails']:
+                leaders.append(leader['leaderMark'])
+
+            page += 1
+
+        return leaders[:count]
+
+    def get_leader_positions(self, mark) -> list[Position]:
+        positions = []
+        url = f'{PUBLIC_BASE_URL}/common/position/list'
+        result = self.http_get(url, {
+            'leaderMark': quote(mark),
+        }).json()['result']['data']
+
+        for p in result:
+            positions.append(Position(
+                p['symbol'],
+                p['side'],
+                Decimal(p['entryPrice']),
+                Decimal(p['sizeX']) / 10 ** 8,
+                datetime.now(),
+                Decimal(p['leverageE2']) / 100,
+                mark
+            ))
+
+        return positions

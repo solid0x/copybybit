@@ -1,5 +1,6 @@
 import dataclasses
 import pybit.exceptions
+import logging
 
 from bybit.api import *
 from bybit.utils import *
@@ -17,7 +18,6 @@ class TradeService:
 
     def load_instruments(self):
         self.instruments = self.api.get_instruments_info()
-        logging.info(f'🧰Instruments loaded: {len(self.instruments)}')
 
     def get_equity(self):
         return self.api.get_coin_balance().equity
@@ -37,8 +37,6 @@ class TradeService:
                 else:
                     qty = round(qty_raw / qty_step) * qty_step
 
-                logging.debug(f'Calculated qty for {symbol} {price}$: {qty} ({qty_raw})')
-
                 if instrument.min_order_qty <= qty <= instrument.max_order_qty:
                     return qty
                 else:
@@ -55,7 +53,6 @@ class TradeService:
     def update_leverage(self, symbol: str, side: str, leverage: Decimal):
         position_info = self.api.get_position_info(symbol, side)
         if position_info.leverage != leverage:
-            logging.info(f'Set {leverage}x leverage for {symbol}')
             self.api.set_leverage(symbol, leverage)
 
     def get_position_info(self, position: Position) -> PositionInfo:
@@ -67,21 +64,17 @@ class TradeService:
     def place_order(self, symbol: str, side: str, price: Decimal, cost: Decimal, leverage: Decimal):
         position = dummy_pos(symbol, side)
 
-        logging.info(f'🔖Place new order: {self.label(position)}')
-
         position_idx = self.get_position_idx(position)
         qty = self.get_qty(symbol, price, cost)
 
         if qty:
             self.update_leverage(symbol, side, leverage)
             self.api.place_order(symbol, side, ORDER_TYPE_LIMIT, qty, str(price), position_idx=position_idx)
-            logging.info(f'{self.label(position)} order opened with {qty} qty')
+            logging.info(f'{self.label(position)} order placed with {qty} qty')
         else:
-            logging.warning(f'❌Position {self.label(position)} is not open')
+            logging.warning(f'Position {self.label(position)} is not open')
 
     def open_position(self, position: Position, cost: Decimal):
-        logging.info(f'⚡️Open new position: {self.label(position)}')
-
         position_idx = self.get_position_idx(position)
         qty = self.get_qty(position.symbol, cost, leverage=position.leverage)
 
@@ -90,11 +83,9 @@ class TradeService:
             self.api.place_order(position.symbol, position.side, ORDER_TYPE_MARKET, qty, position_idx=position_idx)
             logging.info(f'{self.label(position)} opened with {qty} qty')
         else:
-            logging.warning(f'❌Position {self.label(position)} is not open')
+            logging.warning(f'Position {self.label(position)} is not open')
 
     def close_position(self, position: Position):
-        logging.info(f'🔥Close position: {self.label(position)}')
-
         qty = self.get_position_info(position).size
         print(position)
         print(self.get_position_info(position))
@@ -106,12 +97,12 @@ class TradeService:
                                      position_idx=position_idx)
                 logging.info(f'{self.label(position)} with {qty} qty closed')
             except pybit.exceptions.InvalidRequestError as e:
-                logging.error(f"❌Position wasn't closed due to invalid request: {e}")
+                logging.exception(f"Position wasn't closed due to invalid request: {e}")
                 if e.status_code == ERROR_CODE_REDUCE_ONLY_NOT_SATISFIED:
-                    logging.warning(f'⚠️Position {self.label(position)} could be liquidated')
+                    logging.warning(f'Position {self.label(position)} could be liquidated')
                 raise e
         else:
-            logging.warning(f"❌Position for {position.symbol} wasn't open or liquidated")
+            logging.warning(f"Position for {position.symbol} wasn't open or liquidated")
 
     @staticmethod
     def reverse(position: Position) -> Position:

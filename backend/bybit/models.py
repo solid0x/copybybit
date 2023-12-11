@@ -8,23 +8,10 @@ class Position:
     symbol: str
     side: str
     entry_price: Decimal
-    closed_price: Decimal | None
     size: Decimal
     open_at: datetime
-    created_at: datetime
-    closedAt: datetime | None
     leverage: Decimal
     creator: str
-
-
-@dataclass
-class Order:
-    symbol: str
-    side: str
-    entry_price: Decimal
-    size: Decimal
-    created_at: datetime
-    transact_time: datetime
 
 
 @dataclass
