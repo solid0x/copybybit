@@ -17,7 +17,7 @@
         </div>
         <div class="col d-flex align-items-center justify-content-end">
           <p class="mb-0 me-3 text-muted">{{ user.username }}</p>
-          <a href="/api/logout" class="btn btn-outline-danger">Logout</a>
+          <a href="/api/logout" class="btn btn-outline-danger btn-sm">Logout</a>
         </div>
       </div>
 
@@ -40,7 +40,10 @@
           </tr>
         </tbody>
       </table>
-      <p class="text-end text-muted small"><span id="recent-pos-spinner" class="spinner-border spinner-border-sm" role="status"></span><span id="recent-pos-last-updated"> Last updated: -</span></p>
+      <p class="text-end text-muted small">
+        <span id="recent-pos-spinner" class="spinner-border spinner-border-sm" role="status"></span>
+        <span id="recent-pos-last-updated"> Last updated: -</span>
+      </p>
 
       <h6 class="mt-4">Your positions</h6>
       <div id="no-api-key-alert" class="alert alert-warning" role="alert">

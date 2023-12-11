@@ -107,7 +107,7 @@ function updateRecentPositionsTable(positions) {
 		row.innerHTML += '<td>' + position.leverage + '</td>';
 
 		const openAt = new Date(`${position.open_at}Z`);
-		const formattedOpenAt = openAt.toLocaleString("ru-RU", datetimeFormat);
+		const formattedOpenAt = openAt.toLocaleString(datetimeFormat);
 		row.innerHTML += '<td>' + formattedOpenAt + '</td>';
 
 		var actionCell = document.createElement("td");
@@ -132,7 +132,7 @@ function updateRecentPositionsTable(positions) {
 	});
 
 	var lastUpdated = document.getElementById("recent-pos-last-updated");
-	var updatedAt = new Date().toLocaleString("ru-RU", datetimeFormat);
+	var updatedAt = new Date().toLocaleString(datetimeFormat);
 	lastUpdated.innerText = `Last updated: ${updatedAt}`;
 }
 
@@ -160,11 +160,14 @@ function updateUserPositionsTable(positions) {
 		row.innerHTML += '<td>' + position.mark_price + '</td>';
 		row.innerHTML += '<td>' + position.size + '</td>';
 		row.innerHTML += '<td>' + position.leverage + '</td>';
-		row.innerHTML += '<td>' + position.unrealised_pnl + '</td>';
+		if (position.unrealised_pnl >= 0)
+		    row.innerHTML += '<td><span class="badge bg-success rounded-pill p-2">' + position.unrealised_pnl + '</span></td>';
+		else
+		    row.innerHTML += '<td><span class="badge bg-danger rounded-pill p-2">' + position.unrealised_pnl + '</span></td>';
 
 		var actionCell = document.createElement("td");
 		var closeButton = document.createElement("button");
-		closeButton.className = "btn btn-danger btn-sm";
+		closeButton.className = "btn btn-outline-danger btn-sm";
 		closeButton.innerText = "Close";
 		closeButton.onclick = () => {
 			closeButton.setAttribute("disabled", true);
@@ -192,7 +195,7 @@ function updateUserPositionsTable(positions) {
 	});
 
 	var lastUpdated = document.getElementById("user-pos-last-updated");
-	var updatedAt = new Date().toLocaleString("ru-RU", datetimeFormat);
+	var updatedAt = new Date().toLocaleString(datetimeFormat);
 	lastUpdated.innerText = `Last updated: ${updatedAt}`;
 }
 
