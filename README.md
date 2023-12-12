@@ -18,7 +18,7 @@ Web application for monitoring positions of top traders on Bybit Copy Trading pl
 2. Obtain an API key from Bybit and add it to the dashboard.
 
 ### Usage
-Navigate to the dashboard to monitor master traders' positions and control your active positions.
+Navigate to the dashboard to monitor master traders' positions and control your active positions.  
 
-#### Disclaimer
-This is not a guaranteed profit button. Consider potential risks and losses associated with trading.
+##
+<sup>**Disclaimer**: this is not a guaranteed profit button. Consider potential risks and losses associated with trading.</sup>
