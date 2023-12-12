@@ -116,7 +116,6 @@ class FollowService:
         self.load_leaders()
 
         self.iteration += 1
-        print(self.iteration)
 
         for leader_mark in self.followed_leaders:
             leader_positions = self.api.get_leader_positions(leader_mark)

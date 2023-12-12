@@ -41,7 +41,6 @@ def user_logout(request):
 
 def user_register(request):
     form = UserCreationForm(request.POST)
-    print(form)
     if form.is_valid():
         user = form.save()
         UserProfile.objects.create(user=user, api_key='', api_secret='')

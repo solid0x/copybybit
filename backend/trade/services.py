@@ -87,8 +87,6 @@ class TradeService:
 
     def close_position(self, position: Position):
         qty = self.get_position_info(position).size
-        print(position)
-        print(self.get_position_info(position))
 
         if qty:
             position_idx = self.get_position_idx(position)
