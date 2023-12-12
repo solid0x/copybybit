@@ -1,7 +1,6 @@
 import requests
 
 from pybit.unified_trading import HTTP
-from urllib.parse import quote
 
 from .constants import *
 from .models import *
@@ -151,7 +150,7 @@ class BybitLeadersAPI:
         positions = []
         url = f'{PUBLIC_BASE_URL}/common/position/list'
         result = self.http_get(url, {
-            'leaderMark': quote(mark),
+            'leaderMark': mark,
         }).json()['result']['data']
 
         for p in result:
