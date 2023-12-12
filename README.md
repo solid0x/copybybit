@@ -1,8 +1,7 @@
 # CopyBybit
 Web application for monitoring positions of top traders on Bybit Copy Trading platform. Shows recent positions of master traders and allows you to copy them immediately. Control all your positions inside one dashboard.
 
-## Screenshots
-TODO
+![Dashboard.png](/../media/Dashboard.png "Dashboard")
 
 ## Getting Started
 
